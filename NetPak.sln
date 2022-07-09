@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetPak", "NetPak\NetPak.csproj", "{EAB987F9-5A24-41A4-B382-21AE3D9A6F2A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetPak.Test", "NetPak.Test\NetPak.Test.csproj", "{94C29FAE-B3EC-4122-9242-4BC971EE1BBC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BinaryCompare", "BinaryCompare\BinaryCompare\BinaryCompare.vcxproj", "{2E09CD3F-95B8-4FB8-9E4C-932C569EC382}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EAB987F9-5A24-41A4-B382-21AE3D9A6F2A}.Debug|x64.ActiveCfg = Debug|x64
+		{EAB987F9-5A24-41A4-B382-21AE3D9A6F2A}.Debug|x64.Build.0 = Debug|x64
+		{EAB987F9-5A24-41A4-B382-21AE3D9A6F2A}.Release|x64.ActiveCfg = Release|x64
+		{EAB987F9-5A24-41A4-B382-21AE3D9A6F2A}.Release|x64.Build.0 = Release|x64
+		{94C29FAE-B3EC-4122-9242-4BC971EE1BBC}.Debug|x64.ActiveCfg = Debug|x64
+		{94C29FAE-B3EC-4122-9242-4BC971EE1BBC}.Debug|x64.Build.0 = Debug|x64
+		{94C29FAE-B3EC-4122-9242-4BC971EE1BBC}.Release|x64.ActiveCfg = Release|x64
+		{94C29FAE-B3EC-4122-9242-4BC971EE1BBC}.Release|x64.Build.0 = Release|x64
+		{2E09CD3F-95B8-4FB8-9E4C-932C569EC382}.Debug|x64.ActiveCfg = Release|x64
+		{2E09CD3F-95B8-4FB8-9E4C-932C569EC382}.Debug|x64.Build.0 = Release|x64
+		{2E09CD3F-95B8-4FB8-9E4C-932C569EC382}.Release|x64.ActiveCfg = Release|x64
+		{2E09CD3F-95B8-4FB8-9E4C-932C569EC382}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {786D29C5-2604-4996-80CD-53A6353C82D2}
+	EndGlobalSection
+EndGlobal

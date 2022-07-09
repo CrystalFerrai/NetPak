@@ -1,0 +1,4 @@
+*.bat
+response.txt
+OutContent/**
+Paks/Output/**

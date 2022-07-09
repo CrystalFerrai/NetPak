@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NetPak": {
+      "commandName": "Project",
+      "commandLineArgs": "$(ProjectDir)TestData"
+    }
+  }
+}

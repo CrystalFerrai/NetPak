@@ -1,0 +1,3 @@
+[submodule "BinaryCompare"]
+	path = BinaryCompare
+	url = https://github.com/CrystalFerrai/BinaryCompare.git

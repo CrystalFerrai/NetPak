@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BinaryCompare\BinaryCompare\BinaryCompare.vcxproj">
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\NetPak\NetPak.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(ProjectDir)TestData\**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Copy SourceFiles="$(ProjectDir)..\x64\Release\BinaryCompare.dll" DestinationFolder="$(TargetDir)" />
+  </Target>
+
+</Project>
