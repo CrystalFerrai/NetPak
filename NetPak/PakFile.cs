@@ -116,7 +116,7 @@ namespace NetPak
 		/// <summary>
 		/// Mounts an existing pak file and reads its index.
 		/// </summary>
-		/// <param name="path">the path to the file to mount.</param>
+		/// <param name="path">The path to the file to mount.</param>
 		/// <remarks>
 		/// The mounted file will remain open until this instance is disposed or saved. Data for individual entries will be loaded as requested.
 		/// </remarks>
@@ -125,6 +125,30 @@ namespace NetPak
 		{
 			PakFile instance = new();
 			instance.mReadStream = File.OpenRead(path);
+			try
+			{
+				instance.ReadMetadata();
+			}
+			catch
+			{
+				instance.Dispose();
+				throw;
+			}
+			return instance;
+		}
+
+		/// <summary>
+		/// Mounts an existing pak file and reads its index.
+		/// </summary>
+		/// <param name="stream">A stream containing the pak file</param>
+		/// <remarks>
+		/// The passed in stream will be used by this instance for its lifetime. Do not dispose the stream before disposing the instance.
+		/// </remarks>
+		/// <returns>The mounted pak file</returns>
+		public static PakFile Mount(Stream stream)
+		{
+			PakFile instance = new();
+			instance.mReadStream = stream;
 			try
 			{
 				instance.ReadMetadata();
