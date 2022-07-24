@@ -235,6 +235,7 @@ namespace NetPak
 		/// <param name="path">The path to check</param>
 		public bool HasEntry(FString path)
 		{
+			path = new FString(path.Value, path.Encoding, mPathHashSeed);
 			return FindEntry(path) != null;
 		}
 
@@ -655,7 +656,7 @@ namespace NetPak
 
 			dir = dir[0..(lastSlash + 1)];
 
-			if (dir.StartsWith(mMountPoint!))
+			if (mMountPoint!.Length > 0 && dir.StartsWith(mMountPoint!))
 			{
 				dir = "/" + dir[mMountPoint!.Length..];
 			}
