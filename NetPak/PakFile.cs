@@ -116,7 +116,7 @@ namespace NetPak
 		/// <summary>
 		/// Mounts an existing pak file and reads its index.
 		/// </summary>
-		/// <param name="path">the path to the file to mount.</param>
+		/// <param name="path">The path to the file to mount.</param>
 		/// <remarks>
 		/// The mounted file will remain open until this instance is disposed or saved. Data for individual entries will be loaded as requested.
 		/// </remarks>
@@ -125,6 +125,30 @@ namespace NetPak
 		{
 			PakFile instance = new();
 			instance.mReadStream = File.OpenRead(path);
+			try
+			{
+				instance.ReadMetadata();
+			}
+			catch
+			{
+				instance.Dispose();
+				throw;
+			}
+			return instance;
+		}
+
+		/// <summary>
+		/// Mounts an existing pak file and reads its index.
+		/// </summary>
+		/// <param name="stream">A stream containing the pak file</param>
+		/// <remarks>
+		/// The passed in stream will be used by this instance for its lifetime. Do not dispose the stream before disposing the instance.
+		/// </remarks>
+		/// <returns>The mounted pak file</returns>
+		public static PakFile Mount(Stream stream)
+		{
+			PakFile instance = new();
+			instance.mReadStream = stream;
 			try
 			{
 				instance.ReadMetadata();
@@ -188,7 +212,7 @@ namespace NetPak
 			path = new FString(path.Value, path.Encoding, mPathHashSeed);
 			FString entryPath = path;
 			if (entryPath.Value.StartsWith(RootMountPoint)) entryPath = entryPath[RootMountPoint.Length..];
-			if (mRelativeMountPoint != null && entryPath.Value.StartsWith(mRelativeMountPoint)) entryPath = entryPath[mRelativeMountPoint.Length..];
+			if (!string.IsNullOrEmpty(mRelativeMountPoint) && entryPath.Value.StartsWith(mRelativeMountPoint)) entryPath = entryPath[mRelativeMountPoint.Length..];
 
 			PakEntry entry = PakEntry.Create(entryPath, mInfo!.Version, mInfo!.CompressionMethods.Last());
 			entry.SetData(data);
@@ -211,6 +235,7 @@ namespace NetPak
 		/// <param name="path">The path to check</param>
 		public bool HasEntry(FString path)
 		{
+			path = new FString(path.Value, path.Encoding, mPathHashSeed);
 			return FindEntry(path) != null;
 		}
 
@@ -301,7 +326,18 @@ namespace NetPak
 			reader.BaseStream.Position = mInfo.IndexOffset;
 
 			mMountPoint = reader.ReadFString() ?? throw new PakSerializerException("Could not read mount point from pak file");
-			mRelativeMountPoint = mMountPoint.Value.StartsWith(RootMountPoint) ? mMountPoint[RootMountPoint.Length..] : mMountPoint;
+			if (mMountPoint.Value.StartsWith(RootMountPoint))
+			{
+				mRelativeMountPoint = mMountPoint[RootMountPoint.Length..];
+			}
+			else if (Path.IsPathRooted(mMountPoint))
+			{
+				mRelativeMountPoint = string.Empty;
+			}
+			else
+			{
+				mRelativeMountPoint = mMountPoint;
+			}
 
 			int numEntries = reader.ReadInt32();
 
@@ -399,7 +435,7 @@ namespace NetPak
 					pakEntryStream.Seek(offset, SeekOrigin.Begin);
 					PakEntry entry = PakEntry.FromMeta(path, pakEntryStream, mInfo.Version);
 
-					if (mRelativeMountPoint != null) path = PathCombine((FString)mRelativeMountPoint, path);
+					if (!string.IsNullOrEmpty(mRelativeMountPoint)) path = PathCombine((FString)mRelativeMountPoint, path);
 					mEntries.Add(path, entry);
 				}
 			}
@@ -439,7 +475,7 @@ namespace NetPak
 						{
 							directoryMap.Add(parentDirs.Pop(), new List<Tuple<FString, int>>());
 						}
-						
+
 						dir = new List<Tuple<FString, int>>();
 						directoryMap.Add(dirPath, dir);
 					}
@@ -560,7 +596,7 @@ namespace NetPak
 				if (mEntries.TryGetValue(path, out entry)) return entry;
 			}
 
-			if (mRelativeMountPoint == null) return null;
+			if (string.IsNullOrEmpty(mRelativeMountPoint)) return null;
 
 			root = mRelativeMountPoint;
 			if (path.Value.StartsWith(root))
@@ -608,7 +644,7 @@ namespace NetPak
 				dir = dir[RootMountPoint.Length..];
 				if (dir.Length == 0) return new FString("/", path.Encoding);
 			}
-			if (mRelativeMountPoint != null && dir.StartsWith(mRelativeMountPoint))
+			if (!string.IsNullOrEmpty(mRelativeMountPoint) && dir.StartsWith(mRelativeMountPoint))
 			{
 				dir = dir[mRelativeMountPoint.Length..];
 			}
@@ -618,9 +654,9 @@ namespace NetPak
 
 			if (lastSlash < 0) return new FString("/", path.Encoding);
 
-			dir = dir[0..(lastSlash+1)];
+			dir = dir[0..(lastSlash + 1)];
 
-			if (dir.StartsWith(mMountPoint!))
+			if (mMountPoint!.Length > 0 && dir.StartsWith(mMountPoint!))
 			{
 				dir = "/" + dir[mMountPoint!.Length..];
 			}
@@ -634,7 +670,7 @@ namespace NetPak
 			int lastSlash = file.LastIndexOf('/');
 			if (lastSlash < 0) return new FString(path);
 
-			return new FString(file[(lastSlash+1)..], path.Encoding, mPathHashSeed);
+			return new FString(file[(lastSlash + 1)..], path.Encoding, mPathHashSeed);
 		}
 	}
 }
