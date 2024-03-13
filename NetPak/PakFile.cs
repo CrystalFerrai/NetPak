@@ -55,7 +55,7 @@ namespace NetPak
 		public CompressionMethod CompressionMethod => mInfo?.CompressionMethods.Last() ?? CompressionMethod.None;
 
 		/// <summary>
-		/// Gets the paths of all of the entries in this pak file.
+		/// Gets the relative paths of all of the entries in this pak file.
 		/// </summary>
 		public IReadOnlyList<FString> Entries => mEntries.Keys;
 
