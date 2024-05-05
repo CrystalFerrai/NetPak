@@ -19,7 +19,7 @@ namespace NetPak
 	/// </summary>
 	/// <remarks>
 	/// Enum order must match list of strings stored in FPakInfo::CompressionMethods
-	/// from IPlatformPakFile.h.
+	/// from IPlatformFilePak.h.
 	/// </remarks>
 	public enum CompressionMethod
 	{

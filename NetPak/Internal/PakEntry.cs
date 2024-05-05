@@ -53,10 +53,10 @@ namespace NetPak.Internal
 			return instance;
 		}
 
-		public static PakEntry FromMeta(FString path, Stream stream, PakVersion version)
+		public static PakEntry FromMeta(FString path, Stream stream, PakInfo pakInfo)
 		{
-			PakEntry instance = new PakEntry(path, version);
-			instance.LoadMeta(stream);
+			PakEntry instance = new PakEntry(path, pakInfo.Version);
+			instance.LoadMeta(stream, pakInfo);
 			return instance;
 		}
 
@@ -223,7 +223,7 @@ namespace NetPak.Internal
 			}
 		}
 
-		private void LoadMeta(Stream stream)
+		private void LoadMeta(Stream stream, PakInfo pakInfo)
 		{
 			using BinaryReader reader = new BinaryReader(stream, Encoding.ASCII, true);
 
@@ -238,7 +238,10 @@ namespace NetPak.Internal
 			// Bits 5-0 = Compression block size, max value (0x3f) means block size stored separately
 			uint flags = reader.ReadUInt32();
 
-			mCompressionMethod = (CompressionMethod)(flags >> 23 & 0x3f);
+			int compressionMethodIndex = (int)(flags >> 23 & 0x3f);
+			if (compressionMethodIndex >= pakInfo.CompressionMethods.Count) throw new InvalidDataException("Entry in pak has an invalid compression method index");
+
+			mCompressionMethod = pakInfo.CompressionMethods[compressionMethodIndex];
 
 			uint compressionBlockSize = 0;
 			if ((flags & 0x3f) == 0x3f)

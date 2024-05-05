@@ -433,7 +433,7 @@ namespace NetPak
 					if (offset == int.MinValue) continue;
 
 					pakEntryStream.Seek(offset, SeekOrigin.Begin);
-					PakEntry entry = PakEntry.FromMeta(path, pakEntryStream, mInfo.Version);
+					PakEntry entry = PakEntry.FromMeta(path, pakEntryStream, mInfo);
 
 					if (!string.IsNullOrEmpty(mRelativeMountPoint)) path = PathCombine((FString)mRelativeMountPoint, path);
 					mEntries.Add(path, entry);
