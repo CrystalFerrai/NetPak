@@ -11,4 +11,8 @@
     <FileVersion>0.1.0.0</FileVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EpicGames.Oodle\EpicGames.Oodle.csproj" />
+  </ItemGroup>
+
 </Project>

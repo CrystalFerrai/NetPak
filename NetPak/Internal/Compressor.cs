@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using EpicGames.Compression;
 using System.IO.Compression;
 
 namespace NetPak.Internal
@@ -23,29 +24,18 @@ namespace NetPak.Internal
 	{
 		public static int DecompressBlock(Stream compressed, byte[] decompressed, int startIndex, CompressionMethod compressionMethod)
 		{
-			Func<Stream> getStream = new(() =>
-			{
-				switch (compressionMethod)
-				{
-					case CompressionMethod.None:
-						return compressed;
-					case CompressionMethod.Zlib:
-						return new ZLibStream(compressed, CompressionMode.Decompress, true);
-					case CompressionMethod.Gzip:
-						return new GZipStream(compressed, CompressionMode.Decompress, true);
-					case CompressionMethod.Custom:
-					case CompressionMethod.Oodle:
-					case CompressionMethod.LZ4:
-						throw new NotImplementedException($"Compression method {compressionMethod} has not been implemented");
-					case CompressionMethod.Unknown:
-					default:
-						throw new PakSerializerException($"Unrecognized compression method {compressionMethod}");
-				}
-			});
-
-			using Stream stream = getStream();
-
 			int length = decompressed.Length - startIndex;
+
+			using Stream stream = compressionMethod switch
+			{
+				CompressionMethod.None => compressed,
+				CompressionMethod.Zlib => new ZLibStream(compressed, CompressionMode.Decompress, true),
+				CompressionMethod.Gzip => new GZipStream(compressed, CompressionMode.Decompress, true),
+				CompressionMethod.Oodle => new OodleStream(compressed, length, true),
+				CompressionMethod.LZ4 => throw new NotImplementedException($"Compression method {compressionMethod} has not been implemented"),
+				_ => throw new PakSerializerException($"Unrecognized compression method {compressionMethod}")
+			};
+
 			int remaining = length;
 			while (remaining > 0)
 			{
@@ -76,14 +66,22 @@ namespace NetPak.Internal
 						stream.Write(decompressed, startIndex, length);
 					}
 					break;
-				case CompressionMethod.Custom:
 				case CompressionMethod.Oodle:
+					CompressBlock_Oodle(decompressed, compressed, startIndex, length, OodleCompressorType.Kraken, OodleCompressionLevel.Normal);
+					break;
 				case CompressionMethod.LZ4:
 					throw new NotImplementedException($"Compression method {compressionMethod} has not been implemented");
+				case CompressionMethod.Custom:
 				case CompressionMethod.Unknown:
 				default:
 					throw new PakSerializerException($"Unrecognized compression method {compressionMethod}");
 			}
+		}
+
+		public static void CompressBlock_Oodle(byte[] decompressed, Stream compressed, int startIndex, int length, OodleCompressorType type, OodleCompressionLevel level)
+		{
+			using OodleStream stream = new(compressed, type, level, true);
+			stream.Write(decompressed, startIndex, length);
 		}
 	}
 }
